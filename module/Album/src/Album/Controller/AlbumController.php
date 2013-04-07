@@ -91,6 +91,32 @@ class AlbumController extends AbstractActionController {
 	}
 
 	public function deleteAction() {
+        // Capturamos el id de la transacción, viene como parámetro
+        $id = (int) $this->params()->fromRoute('id', 0);
+        // Si no existe redirigimos a la ruta album
+        if (!$id) {
+            return $this->redirect()->toRoute('album');
+        }
+
+        // Caso de que el formulario ya se envío por Post
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            // Capturo la confirmación de borrado
+            $del = $request->getPost('del', 'No');
+            if ($del == 'Yes') {
+                $id = (int) $request->getPost('id');
+                // Borrar
+                $this->getAlbumTable()->deleteAlbum($id);
+            }
+            // Redirigir a ruta album
+            return $this->redirect()->toRoute('album');
+        }
+
+        // Envio parámetros a la vista para generar el formulario
+        return array(
+            'id' => $id,
+            'album' => $this->getAlbumTable()->getAlbum($id),
+        );
 
 	}
 
